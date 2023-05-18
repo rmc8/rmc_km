@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@rmc_km" />
+  <meta name="twitter:creator" content="@rmc_km" />
+  <meta name="twitter:title" content="プロセカ楽曲効率" />
+  <meta name="twitter:description" content="Twitterの書写アカウントのツイートを検索できます。" />
+  <meta property="og:description" content="Twitterの書写アカウントのツイートを検索できます。" />
+  <meta property="og:url" content="https://rmc8.github.io/rmc_Km/shosha_portal" />
+  <meta property="og:title" content="書写ポータル" />
+  <meta name="twitter:image" content="" />
+  <meta property="og:image" content="" />
+  <title>K(@rmc_km)'s profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/lint/style.css" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/icon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./assets/icon/favicon-16x16.png">
+  <link rel="manifest" href="./assets/icon/site.webmanifest">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="./assets/js/lint/script.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <div class="container">
+        <!-- <h1>Profile</h1> -->
+        <nav>
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#hobby">Hobby</a></li>
+            <li><a href="#link">Link</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section id="profile">
+        <div class="profile-icon">
+          <img :src="contents.profile.icon_path" class="twitter_icon" alt="TwitterIcon">
+        </div>
+        <h2 class="user_name">{{ contents.profile.name }}</h2>
+        <p><img :src="contents.profile.discord_icon" alt="DiscordIcon" class="discord_icon">
+          {{ contents.profile.discord_id }}
+        </p>
+      </section>
+      <section id="about">
+        <div class="container">
+          <h2>About</h2>
+          <p>
+            はじめまして。{{ contents.profile.name
+            }}と申します。プログラミングや書写、オーディオなどいろいろな趣味を楽しんでいます。プログラミングのスキルを活かしつつ趣味のWebページをちまちま作っていきますので、楽しく遊んでくださったらとてもうれしいです！
+          </p>
+        </div>
+      </section>
+      <section id="hobby">
+        <div class="container">
+          <h2>Hobby</h2>
+          <p>
+            書ききれないぐらいに趣味がありますが5つ書きます。
+          </p>
+          <ul>
+            <li v-for="hobby in contents.hobbies">
+              <h3>{{ hobby.title }}</h3>
+              <p>
+                {{ hobby.description }}
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <section id="link">
+        <div class="container">
+          <h2>Link</h2>
+          <h3 style="font-size:1.7rem;padding-bottom:24px;">Internal</h3>
+          <ul class="decoration">
+            <li v-for="link in contents.ilinks">
+              <a :href="link.url" target="_blank" rel="noopener noreferrer">{{ link.text }}</a>
+            </li>
+          </ul>
+          <h3 style="font-size:1.7rem;padding-bottom:24px;">External</h3>
+          <div class="links">
+            <a v-for="link in contents.elinks" :href="link.url" target="_blank" rel="noopener noreferrer" class="link">
+              <div class="icon" :style="`background-image: url('${link.icon}')`"></div>
+              <div class="label">{{ link.label }}</div>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        <p>&copy; K(@rmc_km) 2023 | <a href="https://github.com/rmc8/rmc_km">Repository</a></p>
+      </div>
+    </footer>
+    <script>
+      let app = new Vue({
+        el: "#app",
+        data: {
+          contents: {},
+        },
+        mounted() {
+          axios
+            .get("assets/json/data.json")
+            .then(response => (this.contents = response.data))
+            .catch(error => console.log(error))
+        }
+      });
+    </script>
+  </div>
+</body>
+
+</html>
