@@ -48,6 +48,11 @@
       "label": "GitHub",
       "url": "https://github.com/rmc8/",
       "icon": "https://github.githubassets.com/favicon.ico"
+    },
+    {
+      "label": "WishList",
+      "url": "https://www.amazon.jp/hz/wishlist/ls/EFSY7JHYBP5K?ref_=wl_share",
+      "icon": "https://raw.githubusercontent.com/rmc8/rmc_km/main/docs/assets/icon/amzn.png",
     }
   ]
 }
