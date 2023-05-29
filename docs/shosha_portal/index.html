@@ -3,20 +3,19 @@
 
 <head>
     <meta charset="UTF-8" />
+    <meta name="google-site-verification" content="wPpgindvtwVOOeQCpIIgEVZNvi-qlc6bC-i3lqNyUt0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@rmc_km" />
     <meta name="twitter:creator" content="@rmc_km" />
-    <meta name="twitter:title" content="プロセカ楽曲効率" />
+    <meta name="twitter:title" content="書写ポータル" />
+    <meta property="og:title" content="書写ポータル" />
     <meta name="twitter:description" content="Twitterの書写アカウントのツイートを検索できます。" />
     <meta property="og:description" content="Twitterの書写アカウントのツイートを検索できます。" />
     <meta property="og:url" content="https://rmc8.github.io/rmc_Km/shosha_portal" />
-    <meta property="og:title" content="書写ポータル" />
-    <meta name="twitter:image"
-        content="" />
-    <meta property="og:image"
-        content="" />
-    <title>K(@rmc_km) - 書写ポータル</title>
+    <meta name="twitter:image" content="" />
+    <meta property="og:image" content="" />
+    <title>K(@rmc_km) - 書写ポータル(Beta)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
@@ -28,7 +27,9 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     <script src="../assets/js/lint/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <style>
         div.table-container {
             overflow-x: auto;
@@ -38,6 +39,50 @@
             background-color: #24aab3;
             color: white;
             text-align: center;
+        }
+
+        .page_nav button {
+            border: 0px;
+            background-color: #24aab3;
+            color: white;
+            font-weight: bold;
+            padding: 6px;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            border-radius: 50%;
+        }
+
+        .page_nav button:hover,
+        .page_nav button:active {
+            background-color: #0c323c;
+        }
+
+        .page_nav button.active {
+            background-color: #eeeeee;
+            color: #444;
+        }
+
+        .page_nav {
+            padding-bottom: 24px;
+        }
+
+        #tweet {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        table {
+            font-size: 12px;
+        }
+
+        table button {
+            background-color: #0aadb9;
+            padding: 8px;
+            border-radius: 4px;
+            border: 0px;
+            color: #fff;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -56,34 +101,64 @@
             </div>
         </header>
         <main>
-            <section id="profile">
-                <div class="profile-icon">
-                    <img :src="`.${contents.profile.icon_path}`" class="twitter_icon" alt="TwitterIcon">
-                </div>
-                <h2 class="user_name">{{ contents.profile.name }}</h2>
-                <p><img :src="`.${contents.profile.discord_icon}`" alt="DiscordIcon" class="discord_icon">{{
-                    contents.profile.discord_id }}</p>
-            </section>
-            <section id="portal">
-                <div class="container">
-                    <h2>[WIP] 書写ポータル</h2>
-                    <p>
-                        Twitterの書写アカウントのお題を探せるポータルを作っております。現在、作業中でTweetを抽出してデータベース化を進めております。2023年夏頃までの公開を目指しておりますので、どうぞよろしくお願いいたします。
-                    </p>
-                </div>
-            </section>
-            <section id="link">
-                <div class="container">
-                    <h2>Link</h2>
-                    <div class="links">
-                        <a v-for="link in contents.elinks" :href="link.url" target="_blank" rel="noopener noreferrer"
-                            class="link">
-                            <div class="icon" :style="`background-image: url('${link.icon}')`"></div>
-                            <div class="label">{{ link.label }}</div>
-                        </a>
+            <div class="container">
+                <section id="profile">
+                    <div class="profile-icon">
+                        <img :src="`.${contents.profile.icon_path}`" class="twitter_icon" alt="TwitterIcon">
                     </div>
-                </div>
-            </section>
+                    <h2 class="user_name">{{ contents.profile.name }}</h2>
+                    <p><img :src="`.${contents.profile.discord_icon}`" alt="DiscordIcon" class="discord_icon">{{
+                        contents.profile.discord_id }}</p>
+                </section>
+                <section id="portal">
+                    <div class="container">
+                        <h2>[Beta] 書写ポータル</h2>
+                        <p>
+                            Twitterの書写アカウントのお題を探せるポータルを開発中です。Beta版ですが2023年5月29日に公開しました。下記のテーブルから書きたいお題を探してViewボタンを押すとお題のツイートを表示できます。お題を探す検索機能はまだ開発中のためご不便をおかけします。
+                        </p>
+                    </div>
+                </section>
+                <section id="loading-spinner" v-if="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading...</p>
+                </section>
+                <section id="twitterTable" v-if="!loading">
+                    <div class="table-container">
+                        <div class="page_nav">
+                            <button v-if="currentPage > 0" v-on:click="currentPage--">◀</button>
+                            <button v-for="pageNumber in displayedPageNumbers"
+                                :class="{ active: pageNumber-1 === currentPage }" @click="goToPage(pageNumber-1)">
+                                {{ pageNumber }}
+                            </button>
+                            <button v-if="currentPage < pageCount - 1" v-on:click="currentPage++">▶</button>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>TwitterID</th>
+                                    <th>Name</th>
+                                    <th>Content</th>
+                                    <th>Datetime</th>
+                                    <th>View</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in displayedData">
+                                    <td>{{ item.screen_name }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ truncateText(item.content, 56) }}</td>
+                                    <td>{{ moment(item.datetime).format('YYYY-MM-DD HH:mm') }}</td>
+                                    <td><button v-on:click="viewDetails(item.url)">View</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div v-if="detailsUrl" style="margin-top:20px;">
+                        <div id="tweet"> </div>
+                    </div>
+                </section>
+            </div>
         </main>
         <footer>
             <div class="container">
@@ -91,6 +166,7 @@
             </div>
         </footer>
     </div>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     <script>
         let app = new Vue({
             el: "#app",
@@ -98,7 +174,73 @@
                 contents: {},
                 columns: {},
                 data: [],
-                loading: true
+                loading: true,
+                detailsUrl: null,
+                itemsPerPage: 20,
+                currentPage: 0
+            },
+            computed: {
+                displayedData() {
+                    const start = this.currentPage * this.itemsPerPage;
+                    const end = start + this.itemsPerPage;
+                    return this.data.slice(start, end);
+                },
+                pageCount() {
+                    return Math.ceil(this.data.length / this.itemsPerPage);
+                },
+                displayedPageNumbers: function () {
+                    let startPage = Math.max(0, this.currentPage - 5);
+                    let endPage = Math.min(this.pageCount, startPage + 11);
+                    if (endPage - startPage < 11) {
+                        startPage = Math.max(0, endPage - 11);
+                    }
+                    let pages = [];
+                    for (let i = startPage; i < endPage; i++) {
+                        pages.push(i + 1);
+                    }
+                    return pages;
+                }
+            },
+            methods: {
+                truncateText(text, maxLength) {
+                    if (text.length <= maxLength) {
+                        return text;
+                    } else {
+                        return text.substring(0, maxLength) + '...';
+                    }
+                },
+                goToPage: function (pageNumber) {
+                    this.currentPage = pageNumber;
+                },
+                viewDetails: function (url) {
+                    this.detailsUrl = url;
+                    this.$nextTick(() => {
+                        let element = document.getElementById("tweet");
+                        element.scrollIntoView({ behavior: 'smooth' });
+
+                        // ツイート要素を削除
+                        while (element.firstChild) {
+                            element.removeChild(element.firstChild);
+                        }
+
+                        // ツイート要素を再挿入
+                        let tweetBlock = document.createElement("blockquote");
+                        tweetBlock.setAttribute("class", "twitter-tweet");
+                        let p = document.createElement("p");
+                        p.setAttribute("lang", "ja");
+                        p.setAttribute("dir", "ltr");
+                        let a = document.createElement("a");
+                        a.setAttribute("href", this.detailsUrl);
+                        p.appendChild(a);
+                        tweetBlock.appendChild(p);
+                        element.appendChild(tweetBlock);
+
+                        // ウィジェットを再読み込み
+                        if (window.twttr && window.twttr.widgets) {
+                            window.twttr.widgets.load(element);
+                        }
+                    });
+                }
             },
             mounted() {
                 axios
@@ -106,7 +248,7 @@
                     .then(response => (this.contents = response.data))
                     .catch(error => console.log(error))
                 axios.get(
-                    'https://script.google.com/macros/s/AKfycbyRqBREk3ZYTOzvkuw_ZdnG28U__c-64VeXweDP-5PnMjpzuhrf1QIgBbByCTl1xPqO/exec'
+                    'https://script.google.com/macros/s/AKfycbwBQ4SQ3pUSo4wW-4YFNF_ceAi9g9YYrYIXco4WvTAd2MV2bWeLaKVwGcMuVgbqIdGO/exec'
                 ).then(
                     response => {
                         this.columns = response.data.columns;
